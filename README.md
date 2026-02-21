@@ -50,3 +50,4 @@ Founder-Mbti-Test/
 
 ---
 © 2026 Startup Quest. All rights reserved.
+made by sangwon
