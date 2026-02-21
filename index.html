@@ -224,7 +224,8 @@
                 <div class="flex flex-col gap-3" id="action-buttons">
                     <button onclick="saveResultAsImage()" class="nes-btn is-success w-full font-pretendard">결과 이미지로
                         저장</button>
-                    <button onclick="showAllTypes()" class="nes-btn is-primary w-full font-pretendard">전체 페르소나
+                    <button onclick="shareResultNative()" class="nes-btn is-primary w-full font-pretendard">결과 공유하기</button>
+                    <button onclick="showAllTypes()" class="nes-btn w-full font-pretendard">전체 페르소나
                         보기</button>
                     <button onclick="restartQuiz()" class="nes-btn is-error w-full">RETRY</button>
                 </div>
@@ -622,6 +623,32 @@
                 // Restore buttons
                 buttons.style.display = 'flex';
                 resultElement.style.margin = '';
+            }
+        }
+
+        async function shareResultNative() {
+            const typeCode = document.getElementById('result-type-code').innerText;
+            const name = document.getElementById('result-name').innerText;
+            
+            const shareData = {
+                title: '창업가 MBTI: Quest of Founder',
+                text: `나의 창업가 유형은 [${typeCode}] ${name.replace(/\n/g, ' ')} 입니다! 당신의 창업가 DNA도 확인해보세요.`,
+                url: window.location.href
+            };
+
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (err) {
+                    console.error('Share failed:', err);
+                }
+            } else {
+                try {
+                    await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+                    alert('결과가 클립보드에 복사되었습니다!');
+                } catch (err) {
+                    alert('공유하기를 지원하지 않는 기기입니다.');
+                }
             }
         }
 
