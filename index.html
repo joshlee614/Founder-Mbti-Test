@@ -188,7 +188,7 @@
             <div class="nes-container is-dark with-title">
                 <p class="title">RESULT</p>
 
-                <div class="text-center mb-4">
+                <div class="text-center mt-8 mb-4">
                     <div class="nes-balloon from-left is-dark mb-4">
                         <p id="result-type-code" class="text-xs text-yellow-400 mb-1">TYPE</p>
                         <h2 id="result-name" class="text-lg">결과 이름</h2>
@@ -224,7 +224,8 @@
                 <div class="flex flex-col gap-3" id="action-buttons">
                     <button onclick="saveResultAsImage()" class="nes-btn is-success w-full font-pretendard">결과 이미지로
                         저장</button>
-                    <button onclick="shareResultNative()" class="nes-btn is-primary w-full font-pretendard">결과 공유하기</button>
+                    <button onclick="shareResultNative()" class="nes-btn is-primary w-full font-pretendard">결과
+                        공유하기</button>
                     <button onclick="showAllTypes()" class="nes-btn w-full font-pretendard">전체 페르소나
                         보기</button>
                     <button onclick="restartQuiz()" class="nes-btn is-error w-full">RETRY</button>
@@ -256,7 +257,7 @@
             <div class="nes-container is-dark with-title">
                 <p class="title">Detail View</p>
 
-                <div class="text-center mb-4">
+                <div class="text-center mt-8 mb-4">
                     <div class="nes-balloon from-left is-dark mb-4">
                         <p id="detail-type-code" class="text-xs text-yellow-400 mb-1">TYPE</p>
                         <h2 id="detail-name" class="text-lg">결과 이름</h2>
@@ -629,7 +630,7 @@
         async function shareResultNative() {
             const typeCode = document.getElementById('result-type-code').innerText;
             const name = document.getElementById('result-name').innerText;
-            
+
             const shareData = {
                 title: '창업가 MBTI: Quest of Founder',
                 text: `나의 창업가 유형은 [${typeCode}] ${name.replace(/\n/g, ' ')} 입니다! 당신의 창업가 DNA도 확인해보세요.`,
