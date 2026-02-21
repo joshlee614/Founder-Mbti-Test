@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>창업가 MBTI: Quest of Founder</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- NES.css -->
+    <link href="https://unpkg.com/nes.css@latest/css/nes.min.css" rel="stylesheet" />
+    <!-- Google Fonts: Press Start 2P -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!-- html2canvas -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <!-- Pretendard Font -->
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+    <style>
+        /* Base Font: Retro 8-bit */
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #212529;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* Retro background pattern */
+            background-image:
+                linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjMjEyNTI5Ii8+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiMzMzMiLz4KPC9zdmc+');
+        }
+
+        /* Readable Font for Content */
+        .font-pretendard {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 95%;
+            margin: 20px;
+            position: relative;
+            z-index: 10;
+            max-height: 95vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            padding-bottom: 2rem;
+        }
+
+        /* CRT Scanline Effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(to bottom,
+                    rgba(255, 255, 255, 0),
+                    rgba(255, 255, 255, 0) 50%,
+                    rgba(0, 0, 0, 0.1) 50%,
+                    rgba(0, 0, 0, 0.1));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        /* Smooth fade transition */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .btn-option {
+            width: 100%;
+            margin-bottom: 1rem;
+            text-align: left;
+            white-space: normal;
+            height: auto;
+            padding: 1.2rem;
+            line-height: 1.6;
+            font-size: 1rem;
+            /* Readable size */
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .result-box {
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            background-color: #fff;
+            color: #000;
+        }
+
+        /* Scrollbar styling for NES feel */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #212529;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #fff;
+            border: 2px solid #212529;
+        }
+
+        /* Pixelated Image */
+        .image-pixelated {
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- CRT Overlay -->
+    <div class="scanlines"></div>
+
+    <div class="container fade-in" id="app">
+
+        <!-- START SCREEN -->
+        <section id="start-screen" class="nes-container is-dark with-title">
+            <p class="title">Startup Quest</p>
+            <div class="nes-field is-centered text-center mb-8">
+                <i class="nes-icon trophy is-large"></i>
+            </div>
+            <h2 class="text-center text-xl mb-6 text-yellow-400">창업가 MBTI<br>Quest of Founder</h2>
+            <p class="text-center text-xs mb-8 text-gray-400 font-pretendard">당신의 창업가 DNA를 8비트 세계에서 확인하세요.</p>
+
+            <button onclick="startQuiz()" class="nes-btn is-primary w-full">START GAME</button>
+        </section>
+
+        <!-- QUIZ SCREEN -->
+        <section id="quiz-screen" class="hidden">
+            <div class="nes-container is-dark with-title">
+                <p class="title" id="progress-text">Q. 1/12</p>
+
+                <div class="mb-6">
+                    <progress class="nes-progress is-primary" value="0" max="100" id="progress-bar"></progress>
+                </div>
+
+                <div class="min-h-[120px] mb-6 flex items-center justify-center">
+                    <h3 class="text-center leading-relaxed font-pretendard text-lg" id="question-text">질문 내용이 여기에 들어갑니다.
+                    </h3>
+                </div>
+
+                <div class="buttons">
+                    <button onclick="selectAnswer('A')" class="nes-btn btn-option font-pretendard" id="btn-A">A
+                        옵션</button>
+                    <button onclick="selectAnswer('B')" class="nes-btn btn-option font-pretendard" id="btn-B">B
+                        옵션</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- LOADING SCREEN -->
+        <section id="loading-screen" class="hidden text-center">
+            <div class="nes-container is-dark">
+                <p class="mb-4">Analyzing DNA...</p>
+                <progress class="nes-progress is-pattern" value="0" max="100" id="loading-bar"></progress>
+                <p class="mt-4 text-xs text-gray-400 blink">데이터를 분석 중입니다...</p>
+            </div>
+        </section>
+
+        <!-- RESULT SCREEN -->
+        <section id="result-screen" class="hidden">
+            <div class="nes-container is-dark with-title">
+                <p class="title">RESULT</p>
+
+                <div class="text-center mb-4">
+                    <div class="nes-balloon from-left is-dark mb-4">
+                        <p id="result-type-code" class="text-xs text-yellow-400 mb-1">TYPE</p>
+                        <h2 id="result-name" class="text-lg">결과 이름</h2>
+                    </div>
+                    <!-- Avatar Placeholder -->
+                    <img id="result-avatar" src="" alt="Character Avatar"
+                        class="my-6 mx-auto w-32 h-32 image-pixelated bounce">
+                </div>
+
+                <div class="nes-container is-rounded is-white result-box mb-16 text-left mt-8">
+                    <p id="result-desc" class="mb-4 font-pretendard">
+                        분석 내용이 들어갑니다.
+                    </p>
+                </div>
+
+                <div class="nes-container is-dark with-title is-centered mb-16">
+                    <p class="title">Lvl Up Guide</p>
+                    <p id="result-advice" class="text-xs leading-relaxed text-yellow-300 font-pretendard">조언 내용</p>
+                </div>
+
+                <div class="nes-container is-dark with-title is-centered mb-16">
+                    <p class="title">환상의 짝꿍</p>
+                    <div class="flex items-center justify-center gap-4 mt-2">
+                        <img id="match-avatar" src="" alt="Match Avatar" class="w-16 h-16 image-pixelated bounce">
+                        <div class="text-left">
+                            <p id="match-type-code" class="text-[10px] text-yellow-400 mb-1">TYPE</p>
+                            <p id="match-name" class="text-xs font-pretendard whitespace-pre-line leading-relaxed">결과 이름
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-3" id="action-buttons">
+                    <button onclick="saveResultAsImage()" class="nes-btn is-success w-full font-pretendard">결과 이미지로
+                        저장</button>
+                    <button onclick="showAllTypes()" class="nes-btn is-primary w-full font-pretendard">전체 페르소나
+                        보기</button>
+                    <button onclick="restartQuiz()" class="nes-btn is-error w-full">RETRY</button>
+                </div>
+            </div>
+
+            <div class="mt-4 text-center">
+                <p class="text-[10px] text-gray-500">© 2026 Startup Quest. All rights reserved.</p>
+            </div>
+        </section>
+
+        <!-- ALL TYPES SCREEN -->
+        <section id="all-types-screen" class="hidden">
+            <div class="nes-container is-dark with-title">
+                <p class="title">All Personas</p>
+                <div class="text-xs text-center text-gray-400 mb-4 font-pretendard">캐릭터를 클릭하면 상세 설명을 볼 수 있습니다.</div>
+                <div class="grid grid-cols-2 gap-4 mb-6 p-2" id="all-types-grid">
+                    <!-- Populated by JS -->
+                </div>
+                <button onclick="closeAllTypes()" class="nes-btn is-warning w-full font-pretendard">결과로 돌아가기</button>
+            </div>
+            <div class="mt-4 text-center pb-8">
+                <p class="text-[10px] text-gray-500">© 2026 Startup Quest. All rights reserved.</p>
+            </div>
+        </section>
+
+        <!-- PERSONA DETAIL SCREEN -->
+        <section id="persona-detail-screen" class="hidden">
+            <div class="nes-container is-dark with-title">
+                <p class="title">Detail View</p>
+
+                <div class="text-center mb-4">
+                    <div class="nes-balloon from-left is-dark mb-4">
+                        <p id="detail-type-code" class="text-xs text-yellow-400 mb-1">TYPE</p>
+                        <h2 id="detail-name" class="text-lg">결과 이름</h2>
+                    </div>
+                    <img id="detail-avatar" src="" alt="Character Avatar"
+                        class="my-6 mx-auto w-32 h-32 image-pixelated bounce">
+                </div>
+
+                <div class="nes-container is-rounded is-white result-box mb-16 text-left mt-8">
+                    <p id="detail-desc" class="mb-4 font-pretendard whitespace-pre-line leading-relaxed">
+                        분석 내용이 들어갑니다.
+                    </p>
+                </div>
+
+                <div class="nes-container is-dark with-title is-centered mb-16">
+                    <p class="title">환상의 짝꿍</p>
+                    <div class="flex items-center justify-center gap-4 mt-2">
+                        <img id="detail-match-avatar" src="" alt="Match Avatar"
+                            class="w-16 h-16 image-pixelated bounce">
+                        <div class="text-left">
+                            <p id="detail-match-type-code" class="text-[10px] text-yellow-400 mb-1">TYPE</p>
+                            <p id="detail-match-name"
+                                class="text-xs font-pretendard whitespace-pre-line leading-relaxed">결과 이름</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button onclick="closePersonaDetail()" class="nes-btn is-primary w-full font-pretendard">목록으로
+                        돌아가기</button>
+                </div>
+            </div>
+            <div class="mt-4 text-center">
+                <p class="text-[10px] text-gray-500">© 2026 Startup Quest. All rights reserved.</p>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // --- DATA ---
+
+        // 4 Axes:
+        // 1. Action: Field(F) vs Professional(P) (Questions 1-3)
+        // 2. Decision: Data(D) vs Intuition(I) (Questions 4-6)
+        // 3. Focus: Target(T) vs Multi(M) (Questions 7-9)
+        // 4. Risk: Bold(B) vs Stability(S) (Questions 10-12)
+
+        const questions = [
+            // Action (F vs P)
+            {
+                q: "아이디어가 떠올랐을 때 당신의 행동은?",
+                a: { text: "일단 프로토타입부터 만들어서 돌려본다.", type: "F" },
+                b: { text: "시장 조사와 사업 계획서를 완벽하게 정리한다.", type: "P" }
+            },
+            {
+                q: "팀원을 채용할 때 가장 중요하게 보는 것은?",
+                a: { text: "당장의 문제를 해결할 수 있는 실무 능력.", type: "F" },
+                b: { text: "우리 회사의 비전과 문화에 맞는 인재상.", type: "P" }
+            },
+            {
+                q: "경쟁사가 유사한 서비스를 출시했다면?",
+                a: { text: "더 빠른 업데이트와 마케팅으로 찍어 누른다.", type: "F" },
+                b: { text: "우리의 차별점을 다시 분석하고 전략을 수정한다.", type: "P" }
+            },
+            // Decision (D vs I)
+            {
+                q: "중요한 의사결정의 순간, 당신이 믿는 것은?",
+                a: { text: "철저한 데이터와 지표(Metrics).", type: "D" },
+                b: { text: "창업가로서의 직감과 인사이트.", type: "I" }
+            },
+            {
+                q: "새로운 기능을 기획할 때 우선순위 기준은?",
+                a: { text: "USER 로그 데이터와 이탈률 분석 결과.", type: "D" },
+                b: { text: "내가 고객이라면 가장 필요로 할 것 같은 기능.", type: "I" }
+            },
+            {
+                q: "투자자와의 미팅에서 강조하고 싶은 것은?",
+                a: { text: "우리의 성장 지표와 구체적인 예상 매출.", type: "D" },
+                b: { text: "우리가 풀고자 하는 문제의 크기와 비전.", type: "I" }
+            },
+            // Focus (T vs M)
+            {
+                q: "초기 스타트업의 성장 전략 중 선호하는 방식은?",
+                a: { text: "확실한 니치 마켓 하나를 완전히 장악한다.", type: "T" },
+                b: { text: "다양한 가능성을 열어두고 여러 시장을 타진한다.", type: "M" }
+            },
+            {
+                q: "제품 개발 리소스를 분배해야 한다면?",
+                a: { text: "핵심 기능 하나를 100점으로 만드는 데 올인.", type: "T" },
+                b: { text: "다양한 기능을 빠르게 런칭해 반응을 본다.", type: "M" }
+            },
+            {
+                q: "마케팅 채널을 운영한다면?",
+                a: { text: "가장 효율 좋은 채널 하나에 예산을 집중.", type: "T" },
+                b: { text: "온/오프라인 가리지 않고 다각도로 노출.", type: "M" }
+            },
+            // Risk (B vs S)
+            {
+                q: "회사의 잔고가 3개월 치 남았다면?",
+                a: { text: "마지막 승부수로 대형 마케팅 캠페인을 집행한다.", type: "B" },
+                b: { text: "즉시 비용을 절감하고 생존 모드에 돌입한다.", type: "S" }
+            },
+            {
+                q: "대기업에서의 인수 제안이 들어온다면?",
+                a: { text: "거절한다. 우리는 유니콘이 될 거니까.", type: "B" },
+                b: { text: "긍정적으로 검토한다. 안정적인 엑싯도 중요하다.", type: "S" }
+            },
+            {
+                q: "해외 진출 기회가 생겼을 때?",
+                a: { text: "지금 당장 떠난다. 글로벌이 우리의 무대다.", type: "B" },
+                b: { text: "국내 시장 점유율부터 확실히 다지고 간다.", type: "S" }
+            }
+        ];
+
+        const personas = {
+            "FDTB": {
+                name: "The Unicorn Hunter\n(테크 자이언트)",
+                avatar: "./assets/images/hylion_fdtb.png",
+                desc: "당신은 야생마 같은 실행력과 차가운 이성을 동시에 지닌 '테크 자이언트' 유형입니다. 남들이 머뭇거릴 때 이미 프로토타입을 완성해 시장에 던져보고, 실패마저 데이터로 축적하여 무서운 속도로 성장합니다. 직관보다는 지표를 신뢰하며, 작은 성공에 안주하기보다는 세상을 바꿀 거대한 임팩트를 꿈꿉니다. \n\n위험을 두려워하지 않는 대담함은 당신의 가장 큰 무기이지만, 때로는 너무 앞서 나가는 바람에 팀원들이 지쳐 떨어져 나갈 수도 있습니다. 당신에게 스타트업은 단순한 사업이 아니라, 세상을 정복하는 전쟁과도 같습니다. 효율성을 극도로 중시하여 감정적인 소모를 싫어하며, 목표 달성을 위해 비윤리적이지 않은 선에서 모든 수단을 강구하는 냉철한 전략가입니다. 투자자들이 가장 매력을 느끼는 유형이기도 하지만, 동시에 '피도 눈물도 없다'는 평가를 들을 수도 있습니다.",
+                guide: "속도를 조금만 늦추고 주변을 둘러보세요. 혼자 가면 빨리 가지만, 함께 가면 멀리 갑니다.",
+                match: "PIMS"
+            },
+            "FDTS": {
+                name: "The Serial Entrepreneur\n(연쇄 창업가)",
+                avatar: "./assets/images/hylion_fdts.png",
+                desc: "당신은 타고난 사업 감각으로 비즈니스를 시스템화하는 데 능한 '연쇄 창업가' 유형입니다. 실행력이 뛰어나면서도 무모한 도박보다는 계산된 리스크를 선호합니다. 하나의 확실한 타겟 시장을 선정하여 집요하게 파고들며, 그 과정에서 얻은 데이터를 바탕으로 견고한 수익 모델을 만들어냅니다. \n\n당신은 비즈니스의 0부터 1까지를 만드는 데 천부적인 재능이 있으며, 회사가 안정 궤도에 오르면 곧바로 다음 아이템을 찾아 떠나고 싶어 하는 경향이 있습니다. 감정에 휘둘리지 않고 철저히 이익과 효율을 따지는 당신의 결정은 대부분 옳지만, 때로는 그 건조함이 조직의 열정을 식게 만들 수 있습니다. 몽상가가 아닌 현실주의자로서, 당신은 아이디어 자체가 아닌 '실행'과 '검증'이 성공의 열쇠임을 누구보다 잘 알고 있습니다.",
+                guide: "시스템을 만드는 것도 중요하지만, 그 시스템을 움직이는 것은 결국 사람의 마음임을 잊지 마세요.",
+                match: "PIMB"
+            },
+            "FDMB": {
+                name: "The Growth Hacker\n(그로스 해커)",
+                avatar: "./assets/images/hylion_fdmb.png",
+                desc: "당신은 모든 것을 실험하고, 측정하고, 개선하는 '그로스 해커' 유형입니다. 실행력이 바닥을 모를 정도로 넘치며, 하나의 목표보다는 다양한 가능성을 동시에 테스트하며 최적의 경로를 찾아냅니다. 당신에게 실패란 없습니다. 오직 검증되지 않은 가설이 있을 뿐입니다. \n\n데이터에 기반한 의사결정을 내리지만, 그 적용 방식은 매우 공격적이고 혁신적입니다. 시장의 작은 틈새를 발견하면 집요하게 파고들어 폭발적인 성장을 만들어냅니다. 하지만 너무 많은 일을 동시에 벌이다 보니 리소스가 분산되거나, 팀의 방향성이 모호해질 위험도 있습니다. 변화를 사랑하고 정체를 참지 못하는 당신은, 스타트업 씬에서 가장 역동적인 에너지를 가진 리더입니다.",
+                guide: "수많은 실험 중에서도, 회사의 본질을 관통하는 하나의 '북극성 지표'를 잃지 않도록 주의하세요.",
+                match: "PITS"
+            },
+            "FDMS": {
+                name: "The Operation Master\n(오퍼레이션 마스터)",
+                avatar: "./assets/images/hylion_fdms.png",
+                desc: "당신은 복잡한 혼돈 속에서도 질서를 찾아내는 '오퍼레이션 마스터' 유형입니다. 현장에서 발로 뛰는 실행력과 데이터를 기반으로 한 꼼꼼한 관리 능력을 겸비했습니다. 다양한 업무를 동시에 처리하면서도 실수를 용납하지 않는 당신 덕분에, 조직은 안정적으로 돌아갑니다. \n\n대박을 노리는 모험보다는 확실한 성과와 점진적인 개선을 선호합니다. 리스크를 철저히 관리하며 내실을 다지는 스타일이라 위기 상황에서 특히 빛을 발합니다. 하지만 지나친 안정 지향은 폭발적인 성장의 기회를 놓치게 만들 수도 있습니다. 당신은 화려한 스포트라이트를 받기보다는, 묵묵히 기계의 톱니바퀴를 조율하며 거대한 성과를 만들어내는 언성 히어로(Unsung Hero)입니다.",
+                guide: "완벽한 준비란 없습니다. 가끔은 데이터가 부족하더라도 직관을 믿고 과감하게 질러보는 용기가 필요합니다.",
+                match: "PITB"
+            },
+            "FITB": {
+                name: "The Market Innovator\n(마켓 이노베이터)",
+                avatar: "./assets/images/hylion_fitb.png",
+                desc: "당신은 남들이 보지 못하는 미래를 직관적으로 꿰뚫어 보고 과감하게 행동하는 '마켓 이노베이터' 유형입니다. 데이터가 없어도 확신이 있다면 밀어붙이는 불도저 같은 추진력을 가졌습니다. 하나의 확실한 목표를 향해 전력 질주하며, 기존의 관습을 깨부수는 파괴적 혁신을 즐깁니다. \n\n당신의 열정과 비전은 사람들을 매료시키지만, 때로는 현실성 없는 몽상가라는 비판을 받기도 합니다. 하지만 스티브 잡스가 그랬듯, 결국 세상을 바꾸는 건 당신 같은 '현실 왜곡장'을 가진 리더들입니다. 논리보다는 감각, 분석보다는 통찰을 믿는 당신은 아무도 가보지 않은 길을 개척하는 선구자입니다. 리스크는 당신에게 두려움의 대상이 아니라, 성공했을 때의 보상을 극대화하는 레버리지일 뿐입니다.",
+                guide: "당신의 직관은 훌륭하지만, 팀원들을 설득하기 위해서는 최소한의 객관적 근거도 필요합니다.",
+                match: "PDMS"
+            },
+            "FITS": {
+                name: "The Product Craftsman\n(프로덕트 장인)",
+                avatar: "./assets/images/hylion_fits.png",
+                desc: "당신은 자신의 감각과 철학을 담아 완벽한 제품을 만들어내는 '프로덕트 장인' 유형입니다. 실행력이 뛰어나지만 허황된 꿈을 쫓기보다는 현실적이고 완성도 높은 결과물을 추구합니다. 사용자 경험(UX) 하나, 버튼의 픽셀 하나까지 집착하며 '명품' 서비스를 만드는 데 희열을 느낍니다. \n\n직관적으로 무엇이 좋은 제품인지 알고 있으며, 타협하지 않는 고집이 있습니다. 시장의 트렌드를 따르기보다는 자신이 옳다고 믿는 가치를 실현하는 데 집중합니다. 안정적인 기반 위에서 꾸준히 제품을 고도화하는 것을 선호하며, 급격한 변화보다는 지속 가능한 성장을 지향합니다. 당신이 만든 제품은 팬덤을 형성하며, 고객들에게 깊은 신뢰를 줍니다.",
+                guide: "제품의 완성도에 집착하다가 출시 타이밍을 놓칠 수 있습니다. 'Done is better than perfect'를 명심하세요.",
+                match: "PDMB"
+            },
+            "FIMB": {
+                name: "The Pivot Artist\n(피벗 아티스트)",
+                avatar: "./assets/images/hylion_fimb.png",
+                desc: "당신은 변화무쌍한 시장 환경에 누구보다 빠르고 유연하게 대처하는 '피벗 아티스트' 유형입니다. 직관이 뛰어나고 행동력이 빨라 기회를 포착하면 즉시 실행에 옮깁니다. 한 가지 길만 고집하지 않고, 상황에 맞춰 다양한 시도를 하며 최적의 해답을 찾아냅니다. \n\n위험을 감수하는 것을 즐기며, 실패를 두려워하지 않고 오히려 배움의 기회로 삼습니다. 당신의 유연함은 불확실성이 높은 초기 스타트업에서 생존 확률을 극적으로 높여줍니다. 어디로 튈지 모르는 럭비공 같은 매력을 지녔으며, 팀원들에게 끊임없이 새로운 영감을 불어넣습니다. 다만, 잦은 방향 전환으로 인해 조직이 피로감을 느낄 수 있으니 주의해야 합니다.",
+                guide: "유연함은 최고의 무기이지만, 잦은 변경은 독이 됩니다. 바꿀 때는 확실한 명분과 비전을 공유하세요.",
+                match: "PDTS"
+            },
+            "FIMS": {
+                name: "The Community Leader\n(커뮤니티 리더)",
+                avatar: "./assets/images/hylion_fims.png",
+                desc: "당신은 사람의 마음을 움직여 비즈니스를 만들어가는 '커뮤니티 리더' 유형입니다. 논리적인 데이터보다는 사람들의 니즈와 감정을 직관적으로 파악하고, 빠르게 실행하여 팬덤을 형성합니다. 다양한 이해관계자를 아우르며 네트워크를 확장하는 데 탁월한 재능이 있습니다. \n\n큰 위험을 무릅쓰기보다는 조직의 안정과 구성원의 행복을 중요하게 생각합니다. 경쟁보다는 협력을 가치 있게 여기며, 회사가 성장하는 과정에서도 모두가 함께 잘되기를 바랍니다. 당신의 따뜻한 리더십은 위기 상황에서 팀을 하나로 묶는 강력한 힘이 됩니다. 하지만 때로는 냉정한 비즈니스 결정이 필요할 때 망설일 수 있습니다.",
+                guide: "모두를 만족시킬 수는 없습니다. 리더로서 때로는 미움받을 용기가 필요합니다.",
+                match: "PDTB"
+            },
+            "PDTB": {
+                name: "The VC-Style Founder\n(전략가형 창업가)",
+                avatar: "./assets/images/hylion_pdtb.png",
+                desc: "당신은 마치 체스판을 내려다보듯 판 전체를 설계하고 움직이는 '전략가형 창업가' 유형입니다. 즉흥적인 실행보다는 철저한 계획과 분석이 선행되어야 움직입니다. 데이터에 기반하여 확실한 승산이 있는 곳에 집중(Target)하며, 필요할 때는 과감하게 베팅(Bold)할 줄 아는 승부사 기질도 있습니다. \n\n당신의 비즈니스 플랜은 빈틈이 없으며, 투자자들을 논리적으로 압도합니다. 감정에 휘둘리지 않고 냉철하게 이익을 추구하며, 회사의 비전을 달성하기 위해 장기적인 로드맵을 그립니다. 하지만 너무 많은 생각과 검토 때문에 실행 타이밍을 놓칠 우려가 있습니다. 완벽한 계획보다 중요한 것은 실행을 통한 수정임을 기억해야 합니다.",
+                guide: "계획은 완벽합니다. 이제 그만 책상에서 일어나 현장으로 나가세요. 정답은 엑셀 파일이 아닌 고객에게 있습니다.",
+                match: "FIMS"
+            },
+            "PDTS": {
+                name: "The SaaS Architect\n(SaaS 설계자)",
+                avatar: "./assets/images/hylion_pdts.png",
+                desc: "당신은 견고하고 확장 가능한 시스템을 설계하는 'SaaS 설계자' 유형입니다. 계획적이고 신중하며, 데이터를 바탕으로 한 가지 목표에 집중하여 깊이 있는 성과를 만들어냅니다. 리스크를 극도로 싫어하며, 예측 가능한 범위 내에서 비즈니스를 운영하는 것을 선호합니다. \n\n당신의 조직은 매우 체계적이고 효율적입니다. 매뉴얼과 프로세스가 잘 갖춰져 일정한 속도로 굴러갑니다. 하지만 지나친 안정지향성과 경직된 프로세스는 혁신을 저해할 수 있습니다. 스타트업 씬은 한순간에 모든 것이 바뀔 수 있는 곳이기에, 때로는 매뉴얼을 찢어버리는 파격도 필요합니다.",
+                guide: "예측 불가능한 변수까지 계획에 포함시킬 수는 없습니다. 통제 불가능한 상황을 즐기는 여유를 가져보세요.",
+                match: "FIMB"
+            },
+            "PDMB": {
+                name: "The Global Scaler\n(글로벌 스케일러)",
+                avatar: "./assets/images/hylion_pdmb.png",
+                desc: "당신은 치밀한 분석과 방대한 계획을 바탕으로 국경을 넘나드는 확장을 꿈꾸는 '글로벌 스케일러' 유형입니다. 데이터를 중시하지만, 시야가 넓어 다양한 시장과 가능성을 동시에 고려합니다. 위험을 감수하고서라도 큰 판을 벌이는 것을 좋아하며, 복잡한 문제를 구조적으로 해결하는 데 희열을 느낍니다. \n\n멀티태스킹에 능하고 거시적인 안목을 가지고 있어, 회사가 성장할수록 당신의 역량은 빛을 발합니다. 다만, 초기 스타트업 단계에서는 너무 거창한 계획이 발목을 잡을 수 있습니다. 발은 땅에 딛고, 눈은 별을 바라보되, 손은 당장 눈앞의 흙을 만져야 할 때입니다.",
+                guide: "거대한 비전도 좋지만, 당장 다음 달 런웨이를 확보하는 것이 우선일 수 있습니다. 현실 감각을 튜닝하세요.",
+                match: "FITS"
+            },
+            "PDMS": {
+                name: "The Sustainability Guardian\n(지속가능 수호자)",
+                avatar: "./assets/images/hylion_pdms.png",
+                desc: "당신은 느리지만 단단하게, 절대 무너지지 않는 성을 쌓는 '지속가능 수호자' 유형입니다. 계획적이고 데이터를 신뢰하며, 문어발식 확장보다는 다각화된 포트폴리오를 통해 리스크를 분산합니다. 당신에게 스타트업은 '대박'을 위한 도박이 아니라, 오래도록 가치를 창출해야 하는 업(業)입니다. \n\n재무 관념이 철저하여 흑자 경영을 최우선으로 하며, 무리한 투자 유치보다는 자생력을 기르는 데 집중합니다. 직원들에게 안정적인 직장을 제공하는 것을 보람으로 느낍니다. 하지만 경쟁이 치열한 시장에서는 당신의 신중함이 답답하게 느껴질 수 있습니다. 생존을 넘어 성장을 위해서는 때론 안전한 항구를 떠나야 합니다.",
+                guide: "안정이란 정체되어 있는 것이 아니라, 끊임없이 움직이며 균형을 잡는 것입니다. 조금 더 과감해지셔도 됩니다.",
+                match: "FITB"
+            },
+            "PITB": {
+                name: "The Brand Director\n(브랜드 디렉터)",
+                avatar: "./assets/images/hylion_pitb.png",
+                desc: "당신은 비즈니스를 하나의 예술 작품으로 여기는 '브랜드 디렉터' 유형입니다. 꼼꼼한 기획력과 탁월한 직관을 겸비했으며, 하나의 확실한 컨셉에 집중하여 독보적인 브랜드를 만들어냅니다. 데이터로는 설명할 수 없는 '감성'과 '경험'을 중요시하며, 대담한 크리에이티브로 시장에 충격을 줍니다. \n\n당신은 타협하지 않는 취향의 소유자이며, 고객에게 주는 가치가 명확해야 직성이 풀립니다. 마케팅과 브랜딩에 있어 천재적인 감각을 발휘하지만, 제품 개발이나 운영 같은 실무적인 디테일에서 어려움을 겪을 수 있습니다. 이상적인 비전을 현실로 구현하기 위해서는 당신의 꿈을 구체화해 줄 실행가 파트너가 필요합니다.",
+                guide: "브랜딩은 결국 제품에서 완성됩니다. 겉모습뿐만 아니라 본질적인 퀄리티에도 당신의 감각을 쏟아부으세요.",
+                match: "FDMS"
+            },
+            "PITS": {
+                name: "The Niche Specialist\n(니치 스페셜리스트)",
+                avatar: "./assets/images/hylion_pits.png",
+                desc: "당신은 남들이 신경 쓰지 않는 작은 분야를 깊게 파고들어 장악하는 '니치 스페셜리스트' 유형입니다. 계획적이고 직관적이며, 집중력이 뛰어납니다. 대중적인 성공보다는 마니아층의 열광적인 지지를 받는 것을 선호합니다. 안정적인 비즈니스를 추구하며 무리한 확장보다는 내실을 다집니다. \n\n당신은 해당 분야의 '오타쿠'이자 전문가입니다. 고객들이 무엇을 불편해하고 무엇을 원하는지 본능적으로 알고 있으며, 이를 해결하기 위해 치밀하게 준비합니다. 시장 규모가 작다는 것이 단점일 수 있지만, 그 안에서 당신은 절대적인 왕입니다. 다만, 우물 안 개구리가 되지 않기 위해서는 끊임없이 외부 세상과 소통해야 합니다.",
+                guide: "당신의 깊이는 훌륭하지만, 때로는 넓이가 필요할 때가 있습니다. 인접한 시장으로 시야를 조금만 넓혀보세요.",
+                match: "FDMB"
+            },
+            "PIMB": {
+                name: "The Social Impact Creator\n(임팩트 크리에이터)",
+                avatar: "./assets/images/hylion_pimb.png",
+                desc: "당신은 비즈니스라는 도구로 더 나은 세상을 꿈꾸는 '임팩트 크리에이터' 유형입니다. 계획적이면서도 이상향을 쫓으며, 다양한 사회 문제에 관심을 갖고 해결책을 모색합니다. 과감한 도전(Bold)을 통해 사회적 가치와 경제적 이익을 동시에 추구하는 어려운 길을 걷습니다. \n\n당신의 진정성은 많은 사람의 공감을 얻고 강력한 커뮤니티를 형성합니다. 돈만 좇는 장사꾼들을 경멸하며, 의미 있는 일을 한다는 자부심이 당신의 원동력입니다. 하지만 좋은 의도가 항상 좋은 결과를 보장하지는 않습니다. 비영리 단체가 아닌 기업으로서 지속 가능하려면, 수익 모델에 대한 냉철한 고민이 필수적입니다.",
+                guide: "미션은 심장에, 계산기는 머리에 담으세요. 기업의 생존 없이는 그 어떤 선한 영향력도 지속될 수 없습니다.",
+                match: "FDTS"
+            },
+            "PIMS": {
+                name: "The Consultant Founder\n(컨설턴트형 창업가)",
+                avatar: "./assets/images/hylion_pims.png",
+                desc: "당신은 풍부한 지식과 통찰력을 바탕으로 문제를 해결하는 '컨설턴트형 창업가' 유형입니다. 꼼꼼한 계획과 직관적인 문제 해결 능력을 갖췄으며, 한 가지에 올인하기보다는 다양한 프로젝트를 안정적으로 관리하는 데 능합니다. 리스크를 최소화하고 효율성을 극대화하는 스마트한 경영을 추구합니다. \n\n당신은 조언자로서도, 플레이어로서도 훌륭합니다. 객관적인 시각에서 현상을 분석하고 최적의 솔루션을 제시합니다. 하지만 지나친 신중함과 '검토' 모드는 실행력을 떨어뜨릴 수 있습니다. 스타트업은 100%의 정답을 찾아내는 시험이 아니라, 60%의 확신으로 일단 저지르고 수습하는 과정임을 받아들여야 합니다.",
+                guide: "분석은 충분합니다. 이제는 당신의 가설을 시장이라는 거친 바다에 던져 검증받을 시간입니다.",
+                match: "FDTB"
+            }
+        };
+
+        // --- GAME STATE ---
+        let currentQuestionIndex = 0;
+        let scores = {
+            F: 0, P: 0,
+            D: 0, I: 0,
+            T: 0, M: 0,
+            B: 0, S: 0
+        };
+
+        // --- DOM ELEMENTS ---
+        const app = document.getElementById('app');
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const loadingScreen = document.getElementById('loading-screen');
+        const resultScreen = document.getElementById('result-screen');
+
+        const questionText = document.getElementById('question-text');
+        const btnA = document.getElementById('btn-A');
+        const btnB = document.getElementById('btn-B');
+        const progressText = document.getElementById('progress-text');
+        const progressBar = document.getElementById('progress-bar');
+
+        // --- FUNCTIONS ---
+
+        function startQuiz() {
+            startScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            quizScreen.classList.add('fade-in');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestionIndex];
+            questionText.innerText = q.q;
+            btnA.innerText = q.a.text;
+            btnB.innerText = q.b.text;
+
+            // Update Progress
+            const progress = ((currentQuestionIndex) / questions.length) * 100;
+            progressBar.value = progress;
+            progressText.innerText = `Q. ${currentQuestionIndex + 1}/${questions.length}`;
+        }
+
+        function selectAnswer(choice) {
+            const q = questions[currentQuestionIndex];
+            const type = choice === 'A' ? q.a.type : q.b.type;
+
+            // Add Score
+            scores[type]++;
+
+            // Next Question or Finish
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            quizScreen.classList.add('hidden');
+            loadingScreen.classList.remove('hidden');
+            loadingScreen.classList.add('fade-in');
+
+            // Simulate Loading Analysis
+            let loadingValue = 0;
+            const loadingBar = document.getElementById('loading-bar');
+            const interval = setInterval(() => {
+                loadingValue += 5;
+                loadingBar.value = loadingValue;
+                if (loadingValue >= 100) {
+                    clearInterval(interval);
+                    showResult();
+                }
+            }, 100); // 2 seconds total approx
+        }
+
+        function calculateResult() {
+            let result = "";
+            result += scores.F >= scores.P ? "F" : "P";
+            result += scores.D >= scores.I ? "D" : "I";
+            result += scores.T >= scores.M ? "T" : "M";
+            result += scores.B >= scores.S ? "B" : "S";
+            return result;
+        }
+
+        function showResult() {
+            loadingScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            resultScreen.classList.add('fade-in');
+
+            const typeCode = calculateResult();
+            const data = personas[typeCode];
+
+            // Render Data
+            document.getElementById('result-type-code').innerText = typeCode;
+            document.getElementById('result-name').innerText = data.name;
+            document.getElementById('result-avatar').src = data.avatar;
+            document.getElementById('result-desc').innerText = data.desc;
+            document.getElementById('result-advice').innerText = data.guide;
+
+            // Render Match
+            const matchTypeCode = data.match;
+            if (matchTypeCode && personas[matchTypeCode]) {
+                const matchData = personas[matchTypeCode];
+                document.getElementById('match-type-code').innerText = matchTypeCode;
+                document.getElementById('match-name').innerText = matchData.name;
+                document.getElementById('match-avatar').src = matchData.avatar;
+            }
+        }
+
+        async function saveResultAsImage() {
+            const resultElement = document.querySelector('#result-screen .nes-container');
+            const buttons = document.getElementById('action-buttons');
+
+            // Temporary hide buttons before capture
+            buttons.style.display = 'none';
+            resultElement.style.margin = '0';
+
+            try {
+                const canvas = await html2canvas(resultElement, {
+                    backgroundColor: '#212529',
+                    scale: 2 // Higher resolution
+                });
+
+                const link = document.createElement('a');
+                link.download = `startup_mbti_result.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (error) {
+                console.error('Failed to capture image', error);
+                alert('이미지 저장에 실패했습니다.');
+            } finally {
+                // Restore buttons
+                buttons.style.display = 'flex';
+                resultElement.style.margin = '';
+            }
+        }
+
+        function initAllTypes() {
+            const grid = document.getElementById('all-types-grid');
+            grid.innerHTML = '';
+            for (const [code, data] of Object.entries(personas)) {
+                const card = document.createElement('div');
+                card.className = 'nes-container is-rounded is-dark text-center p-3 transition-transform hover:scale-105 cursor-pointer';
+                card.onclick = () => showPersonaDetail(code);
+                card.innerHTML = `
+                    <p class="text-xs text-yellow-400 mb-2 font-bold">${code}</p>
+                    <img src="${data.avatar}" alt="${data.name}" class="mx-auto w-16 h-16 image-pixelated mb-3">
+                    <p class="text-xs font-pretendard leading-tight truncate px-1 text-white">${data.name.split('\n')[0]}</p>
+                    <p class="text-[11px] font-pretendard text-gray-300 mt-1">${data.name.split('\n')[1] || ''}</p>
+                `;
+                grid.appendChild(card);
+            }
+        }
+
+        function showAllTypes() {
+            resultScreen.classList.add('hidden');
+            const allTypesScreen = document.getElementById('all-types-screen');
+            allTypesScreen.classList.remove('hidden');
+            allTypesScreen.classList.add('fade-in');
+            if (document.getElementById('all-types-grid').children.length === 0) {
+                initAllTypes();
+            }
+            // Ensure container scrolls from top
+            document.querySelector('.container').scrollTop = 0;
+        }
+
+        function closeAllTypes() {
+            document.getElementById('all-types-screen').classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            resultScreen.classList.add('fade-in');
+            document.querySelector('.container').scrollTop = 0;
+        }
+
+        function showPersonaDetail(typeCode) {
+            document.getElementById('all-types-screen').classList.add('hidden');
+            const data = personas[typeCode];
+
+            document.getElementById('detail-type-code').innerText = typeCode;
+            document.getElementById('detail-name').innerText = data.name;
+            document.getElementById('detail-avatar').src = data.avatar;
+            document.getElementById('detail-desc').innerText = data.desc;
+
+            // Render Match
+            const matchTypeCode = data.match;
+            if (matchTypeCode && personas[matchTypeCode]) {
+                const matchData = personas[matchTypeCode];
+                document.getElementById('detail-match-type-code').innerText = matchTypeCode;
+                document.getElementById('detail-match-name').innerText = matchData.name;
+                document.getElementById('detail-match-avatar').src = matchData.avatar;
+            }
+
+            const detailScreen = document.getElementById('persona-detail-screen');
+            detailScreen.classList.remove('hidden');
+            detailScreen.classList.add('fade-in');
+            document.querySelector('.container').scrollTop = 0;
+        }
+
+        function closePersonaDetail() {
+            document.getElementById('persona-detail-screen').classList.add('hidden');
+            const allTypesScreen = document.getElementById('all-types-screen');
+            allTypesScreen.classList.remove('hidden');
+            allTypesScreen.classList.add('fade-in');
+            document.querySelector('.container').scrollTop = 0;
+        }
+
+        function restartQuiz() {
+            // Reset State
+            currentQuestionIndex = 0;
+            scores = { F: 0, P: 0, D: 0, I: 0, T: 0, M: 0, B: 0, S: 0 };
+
+            resultScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            startScreen.classList.add('fade-in');
+        }
+
+    </script>
+</body>
+
+</html>
